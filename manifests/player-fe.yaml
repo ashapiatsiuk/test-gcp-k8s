@@ -18,8 +18,6 @@ spec:
       labels:
         app: player-fe
     spec:
-      imagePullSecrets:
-        - name: nebent-registry
       containers:
         - name: player-fe
           image: nginx:1.27
