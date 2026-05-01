@@ -15,10 +15,6 @@ spec:
       labels:
         app: player-fe
     spec:
-      {{- with .Values.global.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       containers:
         - name: player-fe
           image: "{{ .Values.playerFe.image.repository }}:{{ .Values.playerFe.image.tag }}"

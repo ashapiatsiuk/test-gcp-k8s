@@ -4,23 +4,34 @@ kind: Ingress
 metadata:
   name: player-fe
   labels:
-    {{- include "player-fe.playerFe.labels" . | nindent 4 }}
+  {{- include "player-fe.playerFe.labels" . | nindent 4 }}
   {{- $annotations := deepCopy (default (dict) .Values.ingress.fe.annotations) }}
+  {{- range $k, $v := $annotations }}
+  {{- if or (eq $v "") (eq $v nil) }}
+  {{- $_ := unset $annotations $k }}
+  {{- end }}
+  {{- end }}
   {{- if .Values.ingress.gcp.staticIpName }}
   {{- $_ := set $annotations "kubernetes.io/ingress.global-static-ip-name" .Values.ingress.gcp.staticIpName }}
   {{- end }}
   {{- if .Values.ingress.gcp.managedCertificateName }}
   {{- $_ := set $annotations "networking.gke.io/managed-certificates" .Values.ingress.gcp.managedCertificateName }}
   {{- end }}
+  {{- if .Values.ingress.gcp.preSharedCertificateName }}
+  {{- $_ := set $annotations "ingress.gcp.kubernetes.io/pre-shared-cert" .Values.ingress.gcp.preSharedCertificateName }}
+  {{- end }}
+  {{- if eq (.Values.ingress.className | default "") "gce" }}
+  {{- $_ := set $annotations "kubernetes.io/ingress.class" "gce" }}
+  {{- end }}
   {{- if $annotations }}
   annotations:
     {{- toYaml $annotations | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.className }}
+  {{- if and .Values.ingress.className (ne (.Values.ingress.className | default "") "gce") }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
-  {{- if .Values.ingress.tlsSecretName }}
+  {{- if and .Values.ingress.tlsSecretName (ne (.Values.ingress.className | default "") "gce") }}
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}

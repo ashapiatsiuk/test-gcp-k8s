@@ -1,5 +1,3 @@
-global:
-
 ingress:
   className: gce
   host: player.my-cool.server
@@ -9,11 +7,12 @@ ingress:
     staticIpName: ""
     # Optional GKE ManagedCertificate name.
     managedCertificateName: ""
+    # Optional pre-shared certificate name (GCE Ingress). Use this for self-signed certs.
+    preSharedCertificateName: "player-fe-selfsigned"
   fe:
     annotations:
-      kubernetes.io/ingress.allow-http: "true"
-      kubernetes.io/ingress.global-static-ip-name: ""
-      networking.gke.io/managed-certificates: ""
+      kubernetes.io/ingress.allow-http: "false"
+      kubernetes.io/ingress.class: "gce"
 
 playerFe:
   enabled: true
@@ -23,6 +22,7 @@ playerFe:
     tag: "1.27"
     pullPolicy: IfNotPresent
   service:
+    type: ClusterIP
     port: 80
     annotations:
       # Enable container-native load balancing for GKE ingress.
