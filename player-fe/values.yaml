@@ -1,0 +1,60 @@
+global:
+  imagePullSecrets:
+    - name: nebent-registry
+
+ingress:
+  className: gce
+  host: player.my-cool.server
+  tlsSecretName: ""
+  gcp:
+    # Optional global static IP name for GKE ingress.
+    staticIpName: ""
+    # Optional GKE ManagedCertificate name.
+    managedCertificateName: ""
+  fe:
+    annotations:
+      kubernetes.io/ingress.allow-http: "true"
+      kubernetes.io/ingress.global-static-ip-name: ""
+      networking.gke.io/managed-certificates: ""
+
+playerFe:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: nginx
+    tag: "1.27"
+    pullPolicy: IfNotPresent
+  service:
+    port: 80
+    annotations:
+      # Enable container-native load balancing for GKE ingress.
+      cloud.google.com/neg: '{"ingress": true}'
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 15
+    periodSeconds: 20
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  ingress:
+    enabled: true
+    path: /
+    pathType: Prefix

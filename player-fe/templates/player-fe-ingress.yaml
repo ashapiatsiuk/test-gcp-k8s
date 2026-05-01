@@ -1,0 +1,40 @@
+{{- if and .Values.playerFe.enabled .Values.playerFe.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: player-fe
+  labels:
+    {{- include "player-fe.playerFe.labels" . | nindent 4 }}
+  {{- $annotations := deepCopy (default (dict) .Values.ingress.fe.annotations) }}
+  {{- if .Values.ingress.gcp.staticIpName }}
+  {{- $_ := set $annotations "kubernetes.io/ingress.global-static-ip-name" .Values.ingress.gcp.staticIpName }}
+  {{- end }}
+  {{- if .Values.ingress.gcp.managedCertificateName }}
+  {{- $_ := set $annotations "networking.gke.io/managed-certificates" .Values.ingress.gcp.managedCertificateName }}
+  {{- end }}
+  {{- if $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tlsSecretName }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ .Values.ingress.tlsSecretName | quote }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: {{ .Values.playerFe.ingress.path | quote }}
+            pathType: {{ .Values.playerFe.ingress.pathType }}
+            backend:
+              service:
+                name: player-fe
+                port:
+                  number: {{ .Values.playerFe.service.port }}
+{{- end }}

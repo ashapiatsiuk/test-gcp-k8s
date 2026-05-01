@@ -1,0 +1,41 @@
+{{- if .Values.playerFe.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: player-fe
+  labels:
+    {{- include "player-fe.playerFe.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.playerFe.replicaCount }}
+  selector:
+    matchLabels:
+      app: player-fe
+  template:
+    metadata:
+      labels:
+        app: player-fe
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: player-fe
+          image: "{{ .Values.playerFe.image.repository }}:{{ .Values.playerFe.image.tag }}"
+          imagePullPolicy: {{ .Values.playerFe.image.pullPolicy }}
+          {{- with .Values.playerFe.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.playerFe.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.playerFe.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.playerFe.service.port }}
+{{- end }}

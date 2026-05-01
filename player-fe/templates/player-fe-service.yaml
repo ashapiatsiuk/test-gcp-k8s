@@ -1,0 +1,20 @@
+{{- if .Values.playerFe.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: player-fe
+  labels:
+    {{- include "player-fe.playerFe.labels" . | nindent 4 }}
+  {{- with .Values.playerFe.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: player-fe
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ .Values.playerFe.service.port }}
+      targetPort: {{ .Values.playerFe.service.port }}
+{{- end }}
