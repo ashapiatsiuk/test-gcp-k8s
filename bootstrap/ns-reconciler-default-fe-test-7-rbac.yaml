@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ns-reconciler-default-fe-test-7-bootstrap
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: ns-reconciler-default-fe-test-7
+    namespace: config-management-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin

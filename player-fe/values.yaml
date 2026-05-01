@@ -23,6 +23,7 @@ playerFe:
     tag: "1.27"
     pullPolicy: IfNotPresent
   service:
+    type: LoadBalancer
     port: 80
     annotations:
       # Enable container-native load balancing for GKE ingress.
