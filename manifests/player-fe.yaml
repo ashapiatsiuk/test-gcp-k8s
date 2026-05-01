@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: player-fe
+  labels:
+    app: player-fe
+    helm.sh/chart: player-fe-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: player-fe
+    app.kubernetes.io/part-of: player-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: player-fe
+  template:
+    metadata:
+      labels:
+        app: player-fe
+    spec:
+      imagePullSecrets:
+        - name: nebent-registry
+      containers:
+        - name: player-fe
+          image: nginx:1.27
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          ports:
+            - name: http
+              containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: player-fe
+  labels:
+    app: player-fe
+    helm.sh/chart: player-fe-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: player-fe
+    app.kubernetes.io/part-of: player-fe
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  selector:
+    app: player-fe
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: player-fe
+  labels:
+    app: player-fe
+    helm.sh/chart: player-fe-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: player-fe
+    app.kubernetes.io/part-of: player-fe
+  annotations:
+    kubernetes.io/ingress.allow-http: "true"
+spec:
+  ingressClassName: gce
+  rules:
+    - host: player.my-cool.server
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: player-fe
+                port:
+                  number: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: player-fe
+  labels:
+    app: player-fe
+    helm.sh/chart: player-fe-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: player-fe
+    app.kubernetes.io/part-of: player-fe
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: player-fe
+  minReplicas: 1
+  maxReplicas: 1
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80

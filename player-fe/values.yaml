@@ -1,6 +1,4 @@
 global:
-  imagePullSecrets:
-    - name: nebent-registry
 
 ingress:
   className: gce
