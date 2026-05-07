@@ -1,18 +1,22 @@
 ingress:
-  className: gce
+  className: nginx
   host: player.my-cool.server
-  tlsSecretName: ""
-  gcp:
-    # Optional global static IP name for GKE ingress.
-    staticIpName: ""
-    # Optional GKE ManagedCertificate name.
-    managedCertificateName: ""
-    # Optional pre-shared certificate name (GCE Ingress). Use this for self-signed certs.
-    preSharedCertificateName: "player-fe-selfsigned"
+  tlsSecretName: "player-fe-selfsigned"
+  tlsExternalSecret:
+    enabled: true
+    secretStoreRef:
+      kind: ClusterSecretStore
+      name: gcp-secret-manager
+    # GCP Secret Manager secret names and versions containing PEM values.
+    remoteRefs:
+      tlsCrt:
+        key: player-fe-selfsigned-crt
+        version: 1
+      tlsKey:
+        key: player-fe-selfsigned-key
+        version: 1
   fe:
-    annotations:
-      kubernetes.io/ingress.allow-http: "false"
-      kubernetes.io/ingress.class: "gce"
+    annotations: {}
 
 playerFe:
   enabled: true
@@ -33,9 +37,7 @@ playerFe:
   service:
     type: ClusterIP
     port: 80
-    annotations:
-      # Enable container-native load balancing for GKE ingress.
-      cloud.google.com/neg: '{"ingress": true}'
+    annotations: {}
   resources:
     requests:
       cpu: 250m

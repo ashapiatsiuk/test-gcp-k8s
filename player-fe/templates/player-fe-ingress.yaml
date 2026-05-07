@@ -11,32 +11,15 @@ metadata:
   {{- $_ := unset $annotations $k }}
   {{- end }}
   {{- end }}
-  {{- if .Values.ingress.gcp.staticIpName }}
-  {{- $_ := set $annotations "kubernetes.io/ingress.global-static-ip-name" .Values.ingress.gcp.staticIpName }}
-  {{- end }}
-  {{- if .Values.ingress.gcp.managedCertificateName }}
-  {{- $_ := set $annotations "networking.gke.io/managed-certificates" .Values.ingress.gcp.managedCertificateName }}
-  {{- end }}
-  {{- if .Values.ingress.gcp.preSharedCertificateName }}
-  {{- $_ := set $annotations "ingress.gcp.kubernetes.io/pre-shared-cert" .Values.ingress.gcp.preSharedCertificateName }}
-  {{- end }}
-  {{- if eq (.Values.ingress.className | default "") "gce" }}
-  {{- $_ := set $annotations "kubernetes.io/ingress.class" "gce" }}
-  {{- end }}
   {{- if $annotations }}
   annotations:
     {{- toYaml $annotations | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.ingress.className (ne (.Values.ingress.className | default "") "gce") }}
+  {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
-  {{- if and .Values.ingress.tlsSecretName (ne (.Values.ingress.className | default "") "gce") }}
-  defaultBackend:
-    service:
-      name: player-fe
-      port:
-        number: {{ .Values.playerFe.service.port }}
+  {{- if .Values.ingress.tlsSecretName }}
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}
