@@ -32,6 +32,11 @@ spec:
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
   {{- if and .Values.ingress.tlsSecretName (ne (.Values.ingress.className | default "") "gce") }}
+  defaultBackend:
+    service:
+      name: player-fe
+      port:
+        number: {{ .Values.playerFe.service.port }}
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}
