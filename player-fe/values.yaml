@@ -27,7 +27,7 @@ playerFe:
     secretProviderClassName: player-fe-secrets
     projectNumber: "pilot-nebent"
     secretName: secret-file
-    secretVersion: latest
+    secretVersion: 1
     mountPath: /app/.env
     fileName: .env
   service:
