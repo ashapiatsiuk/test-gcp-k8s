@@ -15,6 +15,9 @@ spec:
       labels:
         app: player-fe
     spec:
+      {{- with .Values.playerFe.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
       containers:
         - name: player-fe
           image: "{{ .Values.playerFe.image.repository }}:{{ .Values.playerFe.image.tag }}"
@@ -31,7 +34,23 @@ spec:
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.playerFe.secretManager.enabled }}
+          volumeMounts:
+            - name: secret-manager
+              mountPath: {{ .Values.playerFe.secretManager.mountPath }}
+              subPath: {{ .Values.playerFe.secretManager.fileName }}
+              readOnly: true
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.playerFe.service.port }}
+      {{- if .Values.playerFe.secretManager.enabled }}
+      volumes:
+        - name: secret-manager
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Values.playerFe.secretManager.secretProviderClassName }}
+      {{- end }}
 {{- end }}

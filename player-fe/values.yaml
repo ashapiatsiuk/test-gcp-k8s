@@ -17,10 +17,19 @@ ingress:
 playerFe:
   enabled: true
   replicaCount: 1
+  serviceAccountName: ""
   image:
     repository: nginx
     tag: "1.27"
     pullPolicy: IfNotPresent
+  secretManager:
+    enabled: false
+    secretProviderClassName: player-fe-secrets
+    projectNumber: "119263735347"
+    secretName: secret-file
+    secretVersion: latest
+    mountPath: /app/.env
+    fileName: .env
   service:
     type: ClusterIP
     port: 80
