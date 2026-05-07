@@ -34,23 +34,30 @@ spec:
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.playerFe.secretManager.enabled }}
+          {{- if include "player-fe.csiVolumeNeeded" . | trim }}
           volumeMounts:
+            {{- if .Values.playerFe.secretManager.enabled }}
             - name: secret-manager
               mountPath: {{ .Values.playerFe.secretManager.mountPath }}
               subPath: {{ .Values.playerFe.secretManager.fileName }}
               readOnly: true
+            {{- end }}
+            {{- if include "player-fe.csiTlsEnabled" . | trim }}
+            - name: secret-manager
+              mountPath: /mnt/csi-tls-sync
+              readOnly: true
+            {{- end }}
           {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.playerFe.service.port }}
-      {{- if .Values.playerFe.secretManager.enabled }}
+      {{- if include "player-fe.csiVolumeNeeded" . | trim }}
       volumes:
         - name: secret-manager
           csi:
             driver: secrets-store-gke.csi.k8s.io
             readOnly: true
             volumeAttributes:
-              secretProviderClass: {{ .Values.playerFe.secretManager.secretProviderClassName }}
+              secretProviderClass: {{ include "player-fe.secretProviderClassName" . | quote }}
       {{- end }}
 {{- end }}

@@ -2,6 +2,14 @@ ingress:
   className: nginx
   host: player.my-cool.server
   tlsSecretName: "player-fe-secret-tls"
+  tls:
+    csiSync: true
+    secretProviderClassName: player-fe-csi
+    projectNumber: "119263735347"
+    certSecretName: player-fe-selfsigned-crt
+    certSecretVersion: 1
+    keySecretName: player-fe-selfsigned-key
+    keySecretVersion: 1
   fe:
     annotations:
       kubernetes.io/ingress.class: nginx

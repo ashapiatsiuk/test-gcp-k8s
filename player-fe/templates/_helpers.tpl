@@ -13,3 +13,20 @@ app.kubernetes.io/part-of: player-fe
 app: player-fe
 {{ include "player-fe.commonLabels" . }}
 {{- end }}
+
+{{/* When app Secret Manager mount is disabled, TLS CSI sync uses ingress.tls.secretProviderClassName. */}}
+{{- define "player-fe.secretProviderClassName" -}}
+{{- if .Values.playerFe.secretManager.enabled -}}
+{{- .Values.playerFe.secretManager.secretProviderClassName -}}
+{{- else -}}
+{{- default "player-fe-csi" .Values.ingress.tls.secretProviderClassName -}}
+{{- end -}}
+{{- end }}
+
+{{- define "player-fe.csiTlsEnabled" -}}
+{{- and .Values.ingress.tls.csiSync .Values.ingress.tlsSecretName -}}
+{{- end }}
+
+{{- define "player-fe.csiVolumeNeeded" -}}
+{{- or .Values.playerFe.secretManager.enabled (include "player-fe.csiTlsEnabled" .) -}}
+{{- end }}
