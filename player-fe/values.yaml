@@ -25,7 +25,7 @@ playerFe:
   secretManager:
     enabled: true
     secretProviderClassName: player-fe-secrets
-    projectNumber: "119263735347"
+    projectNumber: "pilot-nebent"
     secretName: secret-file
     secretVersion: latest
     mountPath: /app/.env
