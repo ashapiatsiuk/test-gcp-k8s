@@ -7,7 +7,7 @@ ingress:
     # Optional: create ClusterSecretStore in this chart. Leave disabled if your
     # platform already defines ingress.tlsExternalSecret.secretStoreRef.name.
     clusterSecretStore:
-      enabled: false
+      enabled: true
       projectID: ""
       # ESO GCP auth; Workload Identity is typical on GKE. Match your ESO version docs.
       # https://external-secrets.io/latest/provider/google-secrets-manager/
