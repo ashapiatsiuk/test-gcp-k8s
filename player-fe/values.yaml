@@ -4,6 +4,20 @@ ingress:
   tlsSecretName: "player-fe-selfsigned"
   tlsExternalSecret:
     enabled: true
+    # Optional: create ClusterSecretStore in this chart. Leave disabled if your
+    # platform already defines ingress.tlsExternalSecret.secretStoreRef.name.
+    clusterSecretStore:
+      enabled: false
+      projectID: ""
+      # ESO GCP auth; Workload Identity is typical on GKE. Match your ESO version docs.
+      # https://external-secrets.io/latest/provider/google-secrets-manager/
+      auth:
+        workloadIdentity:
+          clusterLocation: ""
+          clusterName: ""
+          serviceAccountRef:
+            name: ""
+            namespace: external-secrets-system
     secretStoreRef:
       kind: ClusterSecretStore
       name: gcp-secret-manager
