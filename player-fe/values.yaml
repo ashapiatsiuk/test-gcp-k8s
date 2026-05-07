@@ -26,10 +26,10 @@ playerFe:
     enabled: true
     secretProviderClassName: player-fe-secrets
     projectNumber: "119263735347"
-    secretName: secret-file
+    secretName: my-secret-file
     secretVersion: 1
     mountPath: /app/.env
-    fileName: .env
+    fileName: env
   service:
     type: ClusterIP
     port: 80
