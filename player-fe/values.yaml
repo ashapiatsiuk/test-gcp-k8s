@@ -1,36 +1,10 @@
 ingress:
   className: nginx
   host: player.my-cool.server
-  tlsSecretName: "player-fe-selfsigned"
-  tlsExternalSecret:
-    enabled: true
-    # Optional: create ClusterSecretStore in this chart. Leave disabled if your
-    # platform already defines ingress.tlsExternalSecret.secretStoreRef.name.
-    clusterSecretStore:
-      enabled: true
-      projectID: ""
-      # ESO GCP auth; Workload Identity is typical on GKE. Match your ESO version docs.
-      # https://external-secrets.io/latest/provider/google-secrets-manager/
-      auth:
-        workloadIdentity:
-          clusterLocation: ""
-          clusterName: ""
-          serviceAccountRef:
-            name: ""
-            namespace: external-secrets-system
-    secretStoreRef:
-      kind: ClusterSecretStore
-      name: gcp-secret-manager
-    # GCP Secret Manager secret names and versions containing PEM values.
-    remoteRefs:
-      tlsCrt:
-        key: player-fe-selfsigned-crt
-        version: 1
-      tlsKey:
-        key: player-fe-selfsigned-key
-        version: 1
+  tlsSecretName: "player-fe-secret-tls"
   fe:
-    annotations: {}
+    annotations:
+      kubernetes.io/ingress.class: nginx
 
 playerFe:
   enabled: true
