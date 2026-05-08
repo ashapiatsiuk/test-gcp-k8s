@@ -34,24 +34,17 @@ spec:
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if include "player-fe.csiVolumeNeeded" . | trim }}
+          {{- if .Values.playerFe.secretManager.enabled }}
           volumeMounts:
-            {{- if .Values.playerFe.secretManager.enabled }}
             - name: secret-manager
               mountPath: {{ .Values.playerFe.secretManager.mountPath }}
               subPath: {{ .Values.playerFe.secretManager.fileName }}
               readOnly: true
-            {{- end }}
-            {{- if include "player-fe.csiTlsEnabled" . | trim }}
-            - name: secret-manager
-              mountPath: /mnt/csi-tls-sync
-              readOnly: true
-            {{- end }}
           {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.playerFe.service.port }}
-      {{- if include "player-fe.csiVolumeNeeded" . | trim }}
+      {{- if .Values.playerFe.secretManager.enabled }}
       volumes:
         - name: secret-manager
           csi:

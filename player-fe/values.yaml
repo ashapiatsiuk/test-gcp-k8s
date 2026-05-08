@@ -5,6 +5,7 @@ ingress:
   tls:
     csiSync: true
     secretProviderClassName: player-fe-csi
+    serviceAccountName: ""
     projectNumber: "119263735347"
     certSecretName: player-fe-selfsigned-crt
     certSecretVersion: 1
