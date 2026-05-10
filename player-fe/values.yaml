@@ -3,14 +3,11 @@ ingress:
   host: player.my-cool.server
   tlsSecretName: "player-fe-secret-tls"
   tls:
-    csiSync: true
-    secretProviderClassName: player-fe-csi
-    serviceAccountName: "default"
-    projectNumber: "119263735347"
+    enabled: true
     certSecretName: player-fe-selfsigned-crt
-    certSecretVersion: 1
+    certSecretVersion: "1"
     keySecretName: player-fe-selfsigned-key
-    keySecretVersion: 1
+    keySecretVersion: "1"
   fe:
     annotations:
       kubernetes.io/ingress.class: nginx
@@ -19,25 +16,30 @@ playerFe:
   enabled: true
   replicaCount: 1
   serviceAccountName: "default"
+  externalSecrets:
+    enabled: true
+    refreshInterval: 1h
+    secretStoreName: player-fe-gcp-sm
+    gcp:
+      projectID: "pilot-nebent"
+      clusterName: "qa-pilot-claster"
+      clusterLocation: "europe-west3-a"
   image:
     repository: registry.nebent.net/base-images/base-nginx
     tag: "fbb5a591"
     pullPolicy: IfNotPresent
   secretManager:
     enabled: true
-    secretProviderClassName: player-fe-secrets
-    projectNumber: "119263735347"
     secretName: my-secret-file
-    secretVersion: 1
+    secretVersion: "1"
+    targetSecretName: player-fe-env
     mountPath: /app/.env
     fileName: env
   imagePullSecret:
     enabled: true
-    projectNumber: "119263735347"
     secretName: docker-registry-at
-    secretVersion: 1
+    secretVersion: "1"
     targetSecretName: player-fe-image-pull
-    fileName: .dockerconfigjson
   service:
     type: ClusterIP
     port: 80

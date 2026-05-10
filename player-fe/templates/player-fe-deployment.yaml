@@ -18,7 +18,7 @@ spec:
       {{- with .Values.playerFe.serviceAccountName }}
       serviceAccountName: {{ . }}
       {{- end }}
-      {{- if include "player-fe.imagePullSecretEnabled" . | trim }}
+      {{- if .Values.playerFe.imagePullSecret.enabled }}
       imagePullSecrets:
         - name: {{ .Values.playerFe.imagePullSecret.targetSecretName }}
       {{- end }}
@@ -40,7 +40,7 @@ spec:
           {{- end }}
           {{- if .Values.playerFe.secretManager.enabled }}
           volumeMounts:
-            - name: secret-manager
+            - name: app-env
               mountPath: {{ .Values.playerFe.secretManager.mountPath }}
               subPath: {{ .Values.playerFe.secretManager.fileName }}
               readOnly: true
@@ -50,11 +50,8 @@ spec:
               containerPort: {{ .Values.playerFe.service.port }}
       {{- if .Values.playerFe.secretManager.enabled }}
       volumes:
-        - name: secret-manager
-          csi:
-            driver: secrets-store-gke.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: {{ include "player-fe.secretProviderClassName" . | quote }}
+        - name: app-env
+          secret:
+            secretName: {{ .Values.playerFe.secretManager.targetSecretName }}
       {{- end }}
 {{- end }}
