@@ -18,6 +18,10 @@ spec:
       {{- with .Values.playerFe.serviceAccountName }}
       serviceAccountName: {{ . }}
       {{- end }}
+      {{- if include "player-fe.imagePullSecretEnabled" . | trim }}
+      imagePullSecrets:
+        - name: {{ .Values.playerFe.imagePullSecret.targetSecretName }}
+      {{- end }}
       containers:
         - name: player-fe
           image: "{{ .Values.playerFe.image.repository }}:{{ .Values.playerFe.image.tag }}"

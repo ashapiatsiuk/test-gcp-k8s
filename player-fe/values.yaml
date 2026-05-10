@@ -20,8 +20,8 @@ playerFe:
   replicaCount: 1
   serviceAccountName: "default"
   image:
-    repository: nginx
-    tag: "1.27"
+    repository: registry.nebent.net/base-images/base-nginx
+    tag: "fbb5a591"
     pullPolicy: IfNotPresent
   secretManager:
     enabled: true
@@ -31,6 +31,13 @@ playerFe:
     secretVersion: 1
     mountPath: /app/.env
     fileName: env
+  imagePullSecret:
+    enabled: true
+    projectNumber: "119263735347"
+    secretName: docker-registry-at
+    secretVersion: 1
+    targetSecretName: player-fe-image-pull
+    fileName: .dockerconfigjson
   service:
     type: ClusterIP
     port: 80

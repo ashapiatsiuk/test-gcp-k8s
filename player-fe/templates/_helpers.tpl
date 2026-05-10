@@ -27,6 +27,10 @@ app: player-fe
 {{- and .Values.ingress.tls.csiSync .Values.ingress.tlsSecretName -}}
 {{- end }}
 
+{{- define "player-fe.imagePullSecretEnabled" -}}
+{{- and .Values.playerFe.imagePullSecret.enabled .Values.playerFe.imagePullSecret.secretName -}}
+{{- end }}
+
 {{- define "player-fe.csiVolumeNeeded" -}}
-{{- or .Values.playerFe.secretManager.enabled (include "player-fe.csiTlsEnabled" .) -}}
+{{- or .Values.playerFe.secretManager.enabled (include "player-fe.csiTlsEnabled" .) (include "player-fe.imagePullSecretEnabled" .) -}}
 {{- end }}
